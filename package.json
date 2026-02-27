@@ -8,11 +8,11 @@
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "https://github.com/iridite/nodewarden.git"
+    "url": "https://github.com/iridite/nodewarden-enhanced.git"
   },
-  "homepage": "https://github.com/iridite/nodewarden#readme",
+  "homepage": "https://github.com/iridite/nodewarden-enhanced#readme",
   "bugs": {
-    "url": "https://github.com/iridite/nodewarden/issues"
+    "url": "https://github.com/iridite/nodewarden-enhanced/issues"
   },
   "scripts": {
     "dev": "wrangler dev -c wrangler.toml",

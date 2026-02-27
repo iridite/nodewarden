@@ -656,7 +656,7 @@ export function renderRegisterPageHTML(jwtState: JwtSecretState | null): string 
 
       <div class="footer">
         <div><span class="muted" id="t_by">By</span> <a href="https://github.com/Iridyne" target="_blank" rel="noreferrer">Iridite @ Iridyne</a></div>
-        <div><a href="https://github.com/iridite/nodewarden" target="_blank" rel="noreferrer">GitHub</a></div>
+        <div><a href="https://github.com/iridite/nodewarden-enhanced" target="_blank" rel="noreferrer">GitHub</a></div>
         <div style="font-size: 12px; color: var(--muted2); margin-top: 8px;">
           <span id="t_original">Original by</span> <a href="https://github.com/shuaiplus/nodewarden" target="_blank" rel="noreferrer" style="color: var(--muted2);">shuaiplus</a>
         </div>

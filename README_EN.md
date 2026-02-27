@@ -59,15 +59,15 @@ Thanks to [shuaiplus](https://github.com/shuaiplus) for creating the excellent N
 **Deploy steps:**
 
 1. Fork this project (you don't need to fork it if you don't need to update it later).
-2. [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/iridite/nodewarden)
+2. [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/iridite/nodewarden-enhanced)
 3. Open the generated service URL and follow the on-page instructions.
 
 ### CLI deploy
 
 ```bash
 # Clone repository
-git clone https://github.com/iridite/nodewarden.git
-cd nodewarden
+git clone https://github.com/iridite/nodewarden-enhanced.git
+cd nodewarden-enhanced
 
 # Install dependencies
 npm install

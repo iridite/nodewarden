@@ -56,15 +56,15 @@ English：[`README_EN.md`](./README_EN.md)
 **部署步骤：**
 
 1. 先在右上角 fork 此项目（若后续不需要更新，可不 fork）
-2. [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/iridite/nodewarden)
+2. [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/iridite/nodewarden-enhanced)
 3. 打开部署后生成的链接，并根据网页提示完成后续操作。
 
 ### CLI 部署
 
 ```bash
 # 先把仓库拉到本地
-git clone https://github.com/iridite/nodewarden.git
-cd nodewarden
+git clone https://github.com/iridite/nodewarden-enhanced.git
+cd nodewarden-enhanced
 
 # 安装依赖
 npm install
