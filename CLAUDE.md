@@ -8,6 +8,11 @@ NodeWarden Enhanced is a minimal Bitwarden-compatible password manager server ru
 
 **This is an enhanced version based on [shuaiplus/NodeWarden](https://github.com/shuaiplus/NodeWarden), maintained by [Iridite @ Iridyne](https://github.com/Iridyne).**
 
+**Enhanced features:**
+- Health check endpoint (`/health`) for monitoring D1 and R2 status
+- Security audit logs tracking login attempts, IPs, and devices
+- Vault statistics API for cipher counts and storage usage
+
 **Key characteristics:**
 - Single-user only (no organizations/collections)
 - Bitwarden API compatible (works with official clients)

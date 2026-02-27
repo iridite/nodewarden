@@ -117,11 +117,27 @@ export async function handleToken(request: Request, env: Env): Promise<Response>
     const user = await storage.getUser(email);
     if (!user) {
       await rateLimit.recordFailedLogin(loginIdentifier);
+      await storage.logSecurityEvent(
+        'unknown',
+        'login_failed',
+        loginIdentifier,
+        request.headers.get('User-Agent') || 'Unknown',
+        deviceInfo.deviceName,
+        deviceInfo.deviceType
+      ).catch(() => {}); // Don't fail login on log error
       return identityErrorResponse('Username or password is incorrect. Try again', 'invalid_grant', 400);
     }
 
     const valid = await auth.verifyPassword(passwordHash, user.masterPasswordHash);
     if (!valid) {
+      await storage.logSecurityEvent(
+        user.id,
+        'login_failed',
+        loginIdentifier,
+        request.headers.get('User-Agent') || 'Unknown',
+        deviceInfo.deviceName,
+        deviceInfo.deviceType
+      ).catch(() => {});
       return recordFailedLoginAndBuildResponse(
         rateLimit,
         loginIdentifier,
@@ -192,6 +208,16 @@ export async function handleToken(request: Request, env: Env): Promise<Response>
 
     // Successful login - clear failed attempts
     await rateLimit.clearLoginAttempts(loginIdentifier);
+
+    // Log successful login
+    await storage.logSecurityEvent(
+      user.id,
+      'login_success',
+      loginIdentifier,
+      request.headers.get('User-Agent') || 'Unknown',
+      deviceInfo.deviceName,
+      deviceInfo.deviceType
+    ).catch(() => {});
 
     const accessToken = await auth.generateAccessToken(user);
     const refreshToken = await auth.generateRefreshToken(user.id);

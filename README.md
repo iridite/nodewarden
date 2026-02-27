@@ -18,6 +18,16 @@ English：[`README_EN.md`](./README_EN.md)
 ### 原项目致谢
 感谢 [shuaiplus](https://github.com/shuaiplus) 创建了优秀的 NodeWarden 项目，为单用户 Bitwarden 部署提供了简洁高效的解决方案。
 
+### 增强功能
+
+相比原项目，NodeWarden Enhanced 新增了以下功能：
+
+- 🏥 **健康检查端点** (`/health`) - 实时监控 D1 数据库和 R2 存储状态
+- 🔒 **账户安全日志** - 记录所有登录活动（成功/失败）、IP 地址、设备信息
+  - `GET /api/security/logs` - 查看登录历史
+  - `GET /api/security/stats` - 查看安全统计（失败次数、唯一 IP 等）
+- 📊 **密码库统计** (`GET /api/vault/stats`) - 查看密码项数量、类型分布、存储使用情况
+
 ---
 
 ## 与 Bitwarden 官方服务端能力对比

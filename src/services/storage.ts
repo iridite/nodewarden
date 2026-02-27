@@ -63,6 +63,12 @@ const SCHEMA_STATEMENTS: readonly string[] = [
 
   'CREATE TABLE IF NOT EXISTS used_attachment_download_tokens (' +
   'jti TEXT PRIMARY KEY, expires_at INTEGER NOT NULL)',
+
+  'CREATE TABLE IF NOT EXISTS security_logs (' +
+  'id TEXT PRIMARY KEY, user_id TEXT NOT NULL, event_type TEXT NOT NULL, ip TEXT NOT NULL, ' +
+  'user_agent TEXT NOT NULL, device_name TEXT, device_type INTEGER, timestamp INTEGER NOT NULL, ' +
+  'FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE)',
+  'CREATE INDEX IF NOT EXISTS idx_security_logs_user_timestamp ON security_logs(user_id, timestamp DESC)',
 ];
 
 // D1-backed storage.
@@ -807,5 +813,126 @@ export class StorageService {
     ).bind(jti, expiresAtMs).run();
 
     return (result.meta.changes ?? 0) > 0;
+  }
+
+  // --- Security logs ---
+
+  async logSecurityEvent(
+    userId: string,
+    eventType: 'login_success' | 'login_failed' | 'token_refresh' | 'password_change',
+    ip: string,
+    userAgent: string,
+    deviceName?: string,
+    deviceType?: number
+  ): Promise<void> {
+    const id = crypto.randomUUID();
+    const timestamp = Date.now();
+
+    await this.db.prepare(
+      'INSERT INTO security_logs(id, user_id, event_type, ip, user_agent, device_name, device_type, timestamp) ' +
+      'VALUES(?, ?, ?, ?, ?, ?, ?, ?)'
+    ).bind(id, userId, eventType, ip, userAgent, deviceName || null, deviceType || null, timestamp).run();
+  }
+
+  async getSecurityLogs(userId: string, limit: number, offset: number): Promise<any[]> {
+    const rows = await this.db.prepare(
+      'SELECT id, event_type, ip, user_agent, device_name, device_type, timestamp ' +
+      'FROM security_logs WHERE user_id = ? ORDER BY timestamp DESC LIMIT ? OFFSET ?'
+    ).bind(userId, limit, offset).all();
+
+    return (rows.results || []).map((row: any) => ({
+      id: row.id,
+      eventType: row.event_type,
+      ip: row.ip,
+      userAgent: row.user_agent,
+      deviceName: row.device_name,
+      deviceType: row.device_type,
+      timestamp: new Date(row.timestamp).toISOString(),
+    }));
+  }
+
+  async getSecurityStats(userId: string): Promise<any> {
+    const last24h = Date.now() - 24 * 60 * 60 * 1000;
+    const last7d = Date.now() - 7 * 24 * 60 * 60 * 1000;
+
+    const stats = await this.db.prepare(
+      'SELECT ' +
+      'COUNT(*) as total_events, ' +
+      'SUM(CASE WHEN event_type = "login_success" THEN 1 ELSE 0 END) as successful_logins, ' +
+      'SUM(CASE WHEN event_type = "login_failed" THEN 1 ELSE 0 END) as failed_logins, ' +
+      'SUM(CASE WHEN timestamp > ? THEN 1 ELSE 0 END) as events_last_24h, ' +
+      'SUM(CASE WHEN timestamp > ? THEN 1 ELSE 0 END) as events_last_7d, ' +
+      'COUNT(DISTINCT ip) as unique_ips ' +
+      'FROM security_logs WHERE user_id = ?'
+    ).bind(last24h, last7d, userId).first();
+
+    const recentIps = await this.db.prepare(
+      'SELECT DISTINCT ip FROM security_logs WHERE user_id = ? AND timestamp > ? ORDER BY timestamp DESC LIMIT 5'
+    ).bind(userId, last7d).all();
+
+    return {
+      totalEvents: stats?.total_events || 0,
+      successfulLogins: stats?.successful_logins || 0,
+      failedLogins: stats?.failed_logins || 0,
+      eventsLast24h: stats?.events_last_24h || 0,
+      eventsLast7d: stats?.events_last_7d || 0,
+      uniqueIps: stats?.unique_ips || 0,
+      recentIps: (recentIps.results || []).map((r: any) => r.ip),
+    };
+  }
+
+  // --- Vault statistics ---
+
+  async getVaultStats(userId: string): Promise<any> {
+    // Get cipher counts by type
+    const cipherStats = await this.db.prepare(
+      'SELECT ' +
+      'COUNT(*) as total_items, ' +
+      'SUM(CASE WHEN type = 1 THEN 1 ELSE 0 END) as logins, ' +
+      'SUM(CASE WHEN type = 2 THEN 1 ELSE 0 END) as notes, ' +
+      'SUM(CASE WHEN type = 3 THEN 1 ELSE 0 END) as cards, ' +
+      'SUM(CASE WHEN type = 4 THEN 1 ELSE 0 END) as identities, ' +
+      'SUM(CASE WHEN favorite = 1 THEN 1 ELSE 0 END) as favorites, ' +
+      'SUM(CASE WHEN deleted_at IS NOT NULL THEN 1 ELSE 0 END) as deleted ' +
+      'FROM ciphers WHERE user_id = ?'
+    ).bind(userId).first();
+
+    // Get folder count
+    const folderCount = await this.db.prepare(
+      'SELECT COUNT(*) as count FROM folders WHERE user_id = ?'
+    ).bind(userId).first();
+
+    // Get attachment stats
+    const attachmentStats = await this.db.prepare(
+      'SELECT COUNT(*) as count, SUM(size) as total_size ' +
+      'FROM attachments WHERE cipher_id IN (SELECT id FROM ciphers WHERE user_id = ?)'
+    ).bind(userId).first();
+
+    // Get recent activity (last 7 days)
+    const last7d = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    const recentActivity = await this.db.prepare(
+      'SELECT COUNT(*) as count FROM ciphers WHERE user_id = ? AND updated_at > ?'
+    ).bind(userId, last7d).first();
+
+    return {
+      ciphers: {
+        total: cipherStats?.total_items || 0,
+        logins: cipherStats?.logins || 0,
+        notes: cipherStats?.notes || 0,
+        cards: cipherStats?.cards || 0,
+        identities: cipherStats?.identities || 0,
+        favorites: cipherStats?.favorites || 0,
+        deleted: cipherStats?.deleted || 0,
+      },
+      folders: folderCount?.count || 0,
+      attachments: {
+        count: attachmentStats?.count || 0,
+        totalSize: attachmentStats?.total_size || 0,
+        totalSizeMB: Math.round((attachmentStats?.total_size || 0) / 1024 / 1024 * 100) / 100,
+      },
+      activity: {
+        updatedLast7Days: recentActivity?.count || 0,
+      },
+    };
   }
 }

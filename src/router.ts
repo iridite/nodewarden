@@ -43,6 +43,15 @@ import { handleKnownDevice, handleGetDevices, handleUpdateDeviceToken } from './
 // Import handler
 import { handleCiphersImport } from './handlers/import';
 
+// Health check handler
+import { handleHealthCheck } from './handlers/health';
+
+// Security logs handler
+import { handleGetSecurityLogs, handleGetSecurityStats } from './handlers/security';
+
+// Stats handler
+import { handleGetVaultStats } from './handlers/stats';
+
 // Attachment handlers
 import {
   handleCreateAttachment,
@@ -174,6 +183,11 @@ export async function handleRequest(request: Request, env: Env): Promise<Respons
     // Setup status
     if (path === '/setup/status' && method === 'GET') {
       return handleSetupStatus(request, env);
+    }
+
+    // Health check endpoint (no auth required)
+    if (path === '/health' && method === 'GET') {
+      return handleHealthCheck(request, env);
     }
 
     // Browser/devtools probe endpoint
@@ -378,6 +392,20 @@ export async function handleRequest(request: Request, env: Env): Promise<Respons
     // Verify password endpoint
     if (path === '/api/accounts/verify-password' && method === 'POST') {
       return handleVerifyPassword(request, env, userId);
+    }
+
+    // Security logs endpoints
+    if (path === '/api/security/logs' && method === 'GET') {
+      return handleGetSecurityLogs(request, env, userId);
+    }
+
+    if (path === '/api/security/stats' && method === 'GET') {
+      return handleGetSecurityStats(request, env, userId);
+    }
+
+    // Vault statistics endpoint
+    if (path === '/api/vault/stats' && method === 'GET') {
+      return handleGetVaultStats(request, env, userId);
     }
 
     // Sync endpoint

@@ -19,6 +19,16 @@
 ### Credits to Original Project
 Thanks to [shuaiplus](https://github.com/shuaiplus) for creating the excellent NodeWarden project, providing a clean and efficient solution for single-user Bitwarden deployments.
 
+### Enhanced Features
+
+Compared to the original project, NodeWarden Enhanced adds the following features:
+
+- 🏥 **Health Check Endpoint** (`/health`) - Real-time monitoring of D1 database and R2 storage status
+- 🔒 **Account Security Logs** - Records all login activities (success/failure), IP addresses, device information
+  - `GET /api/security/logs` - View login history
+  - `GET /api/security/stats` - View security statistics (failed attempts, unique IPs, etc.)
+- 📊 **Vault Statistics** (`GET /api/vault/stats`) - View cipher counts, type distribution, storage usage
+
 ---
 
 ## Feature Comparison Table (vs Official Bitwarden Server)
