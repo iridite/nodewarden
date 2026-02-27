@@ -20,26 +20,73 @@ English：[`README_EN.md`](./README_EN.md)
 
 ### 增强功能
 
-相比原项目，NodeWarden Enhanced 新增了以下功能：
+相比原项目，NodeWarden Enhanced 新增了以下企业级功能：
 
 #### 🏥 监控与诊断
-- **健康检查端点** (`GET /health`) - 实时监控 D1 数据库和 R2 存储状态
-- **系统诊断** (`GET /setup/diagnostics`) - Setup 页面集成的完整系统检查
+- **健康检查端点** (`GET /health`)
+  - 实时监控 D1 数据库连接状态和响应时间
+  - 实时监控 R2 存储可用性
+  - 返回整体系统健康状态（healthy/degraded）
+  - 适用于外部监控系统集成（如 UptimeRobot、Pingdom）
+
+- **系统诊断** (`GET /setup/diagnostics`)
+  - JWT Secret 配置验证
+  - D1 数据库连接测试
+  - R2 存储连接测试
+  - 用户注册状态检查
+  - TOTP 2FA 配置状态检查
+  - 可集成到 Setup 页面，方便排查部署问题
 
 #### 🔒 安全增强
-- **账户安全日志** - 记录所有登录活动（成功/失败）、IP 地址、设备信息
-  - `GET /api/security/logs` - 查看登录历史（支持分页）
-  - `GET /api/security/stats` - 查看安全统计（失败次数、唯一 IP、最近活动等）
+- **账户安全日志** - 完整的登录活动审计
+  - 自动记录所有登录尝试（成功/失败）
+  - 记录 IP 地址、User-Agent、设备名称和类型
+  - 支持安全事件追溯和异常检测
 
-#### 📊 数据管理
-- **密码库统计** (`GET /api/vault/stats`) - 查看密码项数量、类型分布、存储使用情况
+- **安全日志查询** (`GET /api/security/logs`)
+  - 分页查询登录历史（默认 50 条，最多 100 条）
+  - 支持 offset 参数实现翻页
+  - 返回详细的设备和位置信息
+
+- **安全统计** (`GET /api/security/stats`)
+  - 总登录次数和失败次数
+  - 唯一 IP 地址数量
+  - 唯一设备数量
+  - 最近登录时间和设备信息
+  - 帮助识别异常登录行为
+
+#### 📊 数据管理与分析
+- **密码库统计** (`GET /api/vault/stats`)
+  - 密码项总数和类型分布（登录/笔记/卡片/身份）
+  - 文件夹数量统计
+  - 附件数量和存储空间使用
+  - 收藏项数量
+  - 最近 7 天活动统计
+  - 帮助了解密码库使用情况
+
 - **批量操作** - 高效管理大量密码项
   - `POST /api/ciphers/batch/delete` - 批量软删除（最多 100 项）
-  - `POST /api/ciphers/batch/restore` - 批量恢复（最多 100 项）
+    - 请求体：`{"ids": ["uuid1", "uuid2", ...]}`
+    - 返回删除成功的数量
+  - `POST /api/ciphers/batch/restore` - 批量恢复已删除项（最多 100 项）
+    - 请求体：`{"ids": ["uuid1", "uuid2", ...]}`
+    - 返回恢复成功的数量
   - `POST /api/ciphers/batch/purge` - 批量永久删除（最多 100 项）
+    - 请求体：`{"ids": ["uuid1", "uuid2", ...]}`
+    - 返回永久删除的数量
+    - ⚠️ 此操作不可逆，请谨慎使用
+
 - **增强导出** - 完整的加密备份功能
-  - `GET /api/vault/export/summary` - 查看导出摘要
-  - `POST /api/vault/export` - 导出完整密码库数据（JSON 格式）
+  - `GET /api/vault/export/summary` - 查看导出摘要（不含敏感数据）
+    - 返回密码项数量、文件夹数量、附件数量
+    - 返回总存储空间使用情况
+    - 返回最后修改时间
+  - `POST /api/vault/export` - 导出完整密码库数据
+    - 导出所有密码项（包含加密数据）
+    - 导出所有文件夹结构
+    - 导出设备信息和附件元数据
+    - 返回 JSON 格式，可用于备份或迁移
+    - 支持 Bitwarden 官方客户端导入
 
 ---
 
@@ -114,16 +161,118 @@ npm install
 npm run dev
 ```
 ---
+## API 文档
+
+### 公开端点（无需认证）
+
+#### 健康检查
+```http
+GET /health
+```
+返回系统健康状态，包括数据库和存储的响应时间。
+
+#### 系统诊断
+```http
+GET /setup/diagnostics
+```
+返回完整的系统配置和连接状态，用于排查部署问题。
+
+### 认证端点（需要 Access Token）
+
+所有以下端点需要在请求头中包含：
+```
+Authorization: Bearer <access_token>
+```
+
+#### 安全日志
+```http
+GET /api/security/logs?limit=50&offset=0
+```
+查询参数：
+- `limit`: 返回数量（默认 50，最大 100）
+- `offset`: 偏移量（用于分页）
+
+#### 安全统计
+```http
+GET /api/security/stats
+```
+返回登录统计、唯一 IP/设备数量、最近活动等。
+
+#### 密码库统计
+```http
+GET /api/vault/stats
+```
+返回密码项数量、类型分布、存储使用情况等。
+
+#### 批量删除
+```http
+POST /api/ciphers/batch/delete
+Content-Type: application/json
+
+{
+  "ids": ["uuid1", "uuid2", "uuid3"]
+}
+```
+软删除指定的密码项（最多 100 项）。
+
+#### 批量恢复
+```http
+POST /api/ciphers/batch/restore
+Content-Type: application/json
+
+{
+  "ids": ["uuid1", "uuid2", "uuid3"]
+}
+```
+恢复已删除的密码项（最多 100 项）。
+
+#### 批量永久删除
+```http
+POST /api/ciphers/batch/purge
+Content-Type: application/json
+
+{
+  "ids": ["uuid1", "uuid2", "uuid3"]
+}
+```
+⚠️ 永久删除密码项，此操作不可逆（最多 100 项）。
+
+#### 导出摘要
+```http
+GET /api/vault/export/summary
+```
+返回密码库摘要信息（不含敏感数据）。
+
+#### 导出密码库
+```http
+POST /api/vault/export
+```
+导出完整的密码库数据（JSON 格式），包含所有加密数据。
+
+---
+
 ## 常见问题
 
 **Q: 如何备份数据？**
-A: 在客户端中选择「导出密码库」，保存 JSON 文件。
+A: 有三种方式：
+1. 在 Bitwarden 客户端中选择「导出密码库」
+2. 使用 `GET /api/vault/export/summary` 查看摘要
+3. 使用 `POST /api/vault/export` 导出完整数据（需要 Access Token）
 
 **Q: 忘记主密码怎么办？**
 A: 无法恢复，这是端到端加密的特性。建议妥善保管主密码。
 
 **Q: 可以多人使用吗？**
 A: 不建议。本项目为单用户设计，多人使用请选择 Vaultwarden。
+
+**Q: 如何监控服务状态？**
+A: 使用 `GET /health` 端点，可以集成到 UptimeRobot、Pingdom 等监控服务。
+
+**Q: 如何查看登录历史？**
+A: 使用 `GET /api/security/logs` 端点查看所有登录记录，包括 IP 地址和设备信息。
+
+**Q: 批量操作有什么限制？**
+A: 每次批量操作最多处理 100 个项目，超过限制需要分批处理。
 
 ---
 
