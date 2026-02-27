@@ -37,11 +37,17 @@ import {
 import { handleSync } from './handlers/sync';
 
 // Setup handlers
-import { handleSetupPage, handleSetupStatus } from './handlers/setup';
+import { handleSetupPage, handleSetupStatus, handleSetupDiagnostics } from './handlers/setup';
 import { handleKnownDevice, handleGetDevices, handleUpdateDeviceToken } from './handlers/devices';
 
 // Import handler
 import { handleCiphersImport } from './handlers/import';
+
+// Batch operations handler
+import { handleBatchDeleteCiphers, handleBatchRestoreCiphers, handleBatchPermanentDeleteCiphers } from './handlers/batch';
+
+// Export handler
+import { handleExportVault, handleExportSummary } from './handlers/export';
 
 // Health check handler
 import { handleHealthCheck } from './handlers/health';
@@ -183,6 +189,11 @@ export async function handleRequest(request: Request, env: Env): Promise<Respons
     // Setup status
     if (path === '/setup/status' && method === 'GET') {
       return handleSetupStatus(request, env);
+    }
+
+    // Setup diagnostics
+    if (path === '/setup/diagnostics' && method === 'GET') {
+      return handleSetupDiagnostics(request, env);
     }
 
     // Health check endpoint (no auth required)
@@ -408,6 +419,15 @@ export async function handleRequest(request: Request, env: Env): Promise<Respons
       return handleGetVaultStats(request, env, userId);
     }
 
+    // Vault export endpoints
+    if (path === '/api/vault/export/summary' && method === 'GET') {
+      return handleExportSummary(request, env, userId);
+    }
+
+    if (path === '/api/vault/export' && method === 'POST') {
+      return handleExportVault(request, env, userId);
+    }
+
     // Sync endpoint
     if (path === '/api/sync' && method === 'GET') {
       return handleSync(request, env, userId);
@@ -429,6 +449,19 @@ export async function handleRequest(request: Request, env: Env): Promise<Respons
       if (method === 'POST' || method === 'PUT') {
         return handleBulkMoveCiphers(request, env, userId);
       }
+    }
+
+    // Enhanced batch operations
+    if (path === '/api/ciphers/batch/delete' && method === 'POST') {
+      return handleBatchDeleteCiphers(request, env, userId);
+    }
+
+    if (path === '/api/ciphers/batch/restore' && method === 'POST') {
+      return handleBatchRestoreCiphers(request, env, userId);
+    }
+
+    if (path === '/api/ciphers/batch/purge' && method === 'POST') {
+      return handleBatchPermanentDeleteCiphers(request, env, userId);
     }
 
     // Match /api/ciphers/:id patterns

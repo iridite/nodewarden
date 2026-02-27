@@ -23,11 +23,24 @@ Thanks to [shuaiplus](https://github.com/shuaiplus) for creating the excellent N
 
 Compared to the original project, NodeWarden Enhanced adds the following features:
 
-- 🏥 **Health Check Endpoint** (`/health`) - Real-time monitoring of D1 database and R2 storage status
-- 🔒 **Account Security Logs** - Records all login activities (success/failure), IP addresses, device information
-  - `GET /api/security/logs` - View login history
-  - `GET /api/security/stats` - View security statistics (failed attempts, unique IPs, etc.)
-- 📊 **Vault Statistics** (`GET /api/vault/stats`) - View cipher counts, type distribution, storage usage
+#### 🏥 Monitoring & Diagnostics
+- **Health Check Endpoint** (`GET /health`) - Real-time monitoring of D1 database and R2 storage status
+- **System Diagnostics** (`GET /setup/diagnostics`) - Comprehensive system checks integrated into setup page
+
+#### 🔒 Security Enhancements
+- **Account Security Logs** - Records all login activities (success/failure), IP addresses, device information
+  - `GET /api/security/logs` - View login history (with pagination)
+  - `GET /api/security/stats` - View security statistics (failed attempts, unique IPs, recent activity, etc.)
+
+#### 📊 Data Management
+- **Vault Statistics** (`GET /api/vault/stats`) - View cipher counts, type distribution, storage usage
+- **Batch Operations** - Efficiently manage large numbers of items
+  - `POST /api/ciphers/batch/delete` - Batch soft delete (up to 100 items)
+  - `POST /api/ciphers/batch/restore` - Batch restore (up to 100 items)
+  - `POST /api/ciphers/batch/purge` - Batch permanent delete (up to 100 items)
+- **Enhanced Export** - Complete encrypted backup functionality
+  - `GET /api/vault/export/summary` - View export summary
+  - `POST /api/vault/export` - Export complete vault data (JSON format)
 
 ---
 

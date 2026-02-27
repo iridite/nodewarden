@@ -22,11 +22,24 @@ English：[`README_EN.md`](./README_EN.md)
 
 相比原项目，NodeWarden Enhanced 新增了以下功能：
 
-- 🏥 **健康检查端点** (`/health`) - 实时监控 D1 数据库和 R2 存储状态
-- 🔒 **账户安全日志** - 记录所有登录活动（成功/失败）、IP 地址、设备信息
-  - `GET /api/security/logs` - 查看登录历史
-  - `GET /api/security/stats` - 查看安全统计（失败次数、唯一 IP 等）
-- 📊 **密码库统计** (`GET /api/vault/stats`) - 查看密码项数量、类型分布、存储使用情况
+#### 🏥 监控与诊断
+- **健康检查端点** (`GET /health`) - 实时监控 D1 数据库和 R2 存储状态
+- **系统诊断** (`GET /setup/diagnostics`) - Setup 页面集成的完整系统检查
+
+#### 🔒 安全增强
+- **账户安全日志** - 记录所有登录活动（成功/失败）、IP 地址、设备信息
+  - `GET /api/security/logs` - 查看登录历史（支持分页）
+  - `GET /api/security/stats` - 查看安全统计（失败次数、唯一 IP、最近活动等）
+
+#### 📊 数据管理
+- **密码库统计** (`GET /api/vault/stats`) - 查看密码项数量、类型分布、存储使用情况
+- **批量操作** - 高效管理大量密码项
+  - `POST /api/ciphers/batch/delete` - 批量软删除（最多 100 项）
+  - `POST /api/ciphers/batch/restore` - 批量恢复（最多 100 项）
+  - `POST /api/ciphers/batch/purge` - 批量永久删除（最多 100 项）
+- **增强导出** - 完整的加密备份功能
+  - `GET /api/vault/export/summary` - 查看导出摘要
+  - `POST /api/vault/export` - 导出完整密码库数据（JSON 格式）
 
 ---
 

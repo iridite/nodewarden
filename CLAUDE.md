@@ -10,8 +10,11 @@ NodeWarden Enhanced is a minimal Bitwarden-compatible password manager server ru
 
 **Enhanced features:**
 - Health check endpoint (`/health`) for monitoring D1 and R2 status
+- System diagnostics endpoint (`/setup/diagnostics`) for setup page
 - Security audit logs tracking login attempts, IPs, and devices
 - Vault statistics API for cipher counts and storage usage
+- Batch operations for efficient bulk management (delete/restore/purge)
+- Enhanced export functionality for complete vault backups
 
 **Key characteristics:**
 - Single-user only (no organizations/collections)
