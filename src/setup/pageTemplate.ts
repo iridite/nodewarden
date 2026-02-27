@@ -11,7 +11,7 @@ export function renderRegisterPageHTML(jwtState: JwtSecretState | null): string 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NodeWarden</title>
+  <title>NodeWarden Enhanced</title>
   <style>
     :root {
       color-scheme: light;
@@ -460,9 +460,9 @@ export function renderRegisterPageHTML(jwtState: JwtSecretState | null): string 
       <button id="langToggle" class="lang-toggle" type="button" onclick="toggleLanguage()">EN</button>
 
       <div class="top">
-        <div class="mark" aria-label="NodeWarden">NW</div>
+        <div class="mark" aria-label="NodeWarden Enhanced">NW</div>
         <div class="title">
-          <h1 id="t_app">NodeWarden</h1>
+          <h1 id="t_app">NodeWarden Enhanced</h1>
           <p id="t_tag">Minimal Bitwarden-compatible server on Cloudflare Workers.</p>
         </div>
       </div>
@@ -474,7 +474,7 @@ export function renderRegisterPageHTML(jwtState: JwtSecretState | null): string 
         <h2 id="t_s1_title">Welcome</h2>
         <p class="lead" id="t_s1_desc"></p>
         <div class="kv" style="margin-top:14px;">
-          <h3 id="t_s1_adv_title">Why NodeWarden</h3>
+          <h3 id="t_s1_adv_title">Why NodeWarden Enhanced</h3>
           <ul>
             <li id="t_s1_adv_1"></li>
             <li id="t_s1_adv_2"></li>
@@ -655,8 +655,11 @@ export function renderRegisterPageHTML(jwtState: JwtSecretState | null): string 
       </div>
 
       <div class="footer">
-        <div><span class="muted" id="t_by">By</span> <a href="https://shuai.plus" target="_blank" rel="noreferrer">shuaiplus</a></div>
-        <div><a href="https://github.com/shuaiplus/nodewarden" target="_blank" rel="noreferrer">GitHub</a></div>
+        <div><span class="muted" id="t_by">By</span> <a href="https://github.com/Iridyne" target="_blank" rel="noreferrer">Iridite @ Iridyne</a></div>
+        <div><a href="https://github.com/iridite/nodewarden" target="_blank" rel="noreferrer">GitHub</a></div>
+        <div style="font-size: 12px; color: var(--muted2); margin-top: 8px;">
+          <span id="t_original">Original by</span> <a href="https://github.com/shuaiplus/nodewarden" target="_blank" rel="noreferrer" style="color: var(--muted2);">shuaiplus</a>
+        </div>
       </div>
     </aside>
 
@@ -696,11 +699,12 @@ export function renderRegisterPageHTML(jwtState: JwtSecretState | null): string 
 
     function t(key) {
       const zh = {
-        app: 'NodeWarden',
+        app: 'NodeWarden Enhanced',
         tag: '部署在 Cloudflare Workers 上的 Bitwarden 兼容服务端。',
         by: '作者',
+        original: '原作者',
 
-        s1Title: '恭喜你，NodeWarden 部署成功',
+        s1Title: '恭喜你，NodeWarden Enhanced 部署成功',
         s1Desc: '这是一个无需自建服务器的 Bitwarden 第三方服务端：部署快、维护轻、可用官方客户端直接连接。点击右下角“下一步”开始检测。',
         s1AdvTitle: '核心优势',
         s1Adv1: '无需 VPS，直接运行在 Cloudflare Workers',
@@ -736,7 +740,7 @@ export function renderRegisterPageHTML(jwtState: JwtSecretState | null): string 
         s3Title: '更新策略（可跳过）',
         s3CommonTitle: '共同前置步骤',
         s3Common1: '如果还没 fork，请先 fork 本项目到你自己的 GitHub。',
-        s3Common2: 'Cloudflare 控制台 → Workers 和 Pages → NodeWarden → 设置 → 构建 → Git 存储库 → 断开联机。',
+        s3Common2: 'Cloudflare 控制台 → Workers 和 Pages → NodeWarden Enhanced → 设置 → 构建 → Git 存储库 → 断开联机。',
         s3Common3: '在同一位置重新绑定到你自己 fork 的仓库。',
         manualSync: '手动同步',
         autoSync: '自动同步',
@@ -752,7 +756,7 @@ export function renderRegisterPageHTML(jwtState: JwtSecretState | null): string 
         s4Desc: '填写信息并创建你的唯一账号。创建成功后会进入登录 TOTP 教程。',
         s5Title: '开启登录 TOTP（2FA，可跳过）',
         s5EnableTitle: '服务端开启（Cloudflare Workers）',
-        s5Enable1: '打开 Cloudflare 控制台 -> Workers 和 Pages -> NodeWarden -> 设置 -> 变量和机密。',
+        s5Enable1: '打开 Cloudflare 控制台 -> Workers 和 Pages -> NodeWarden Enhanced -> 设置 -> 变量和机密。',
         s5Enable2: '新增 Secret：TOTP_SECRET，值填写下方生成的 Base32 密钥。',
         s5QrTitle: '扫描二维码',
         copyCode: '复制验证码',
@@ -782,11 +786,12 @@ export function renderRegisterPageHTML(jwtState: JwtSecretState | null): string 
       };
 
       const en = {
-        app: 'NodeWarden',
+        app: 'NodeWarden Enhanced',
         tag: 'Minimal Bitwarden-compatible server on Cloudflare Workers.',
         by: 'By',
+        original: 'Original by',
 
-        s1Title: 'NodeWarden deployed successfully',
+        s1Title: 'NodeWarden Enhanced deployed successfully',
         s1Desc: 'A Bitwarden-compatible server without managing your own VPS: simple deployment, low maintenance, and official client compatibility. Click Next to start checks.',
         s1AdvTitle: 'Highlights',
         s1Adv1: 'No VPS required, runs on Cloudflare Workers',
@@ -1031,7 +1036,7 @@ export function renderRegisterPageHTML(jwtState: JwtSecretState | null): string 
     }
 
     function buildTotpUri(seed) {
-      const issuer = 'NodeWarden';
+      const issuer = 'NodeWarden Enhanced';
       const account = getTotpAccountLabel();
       return 'otpauth://totp/' + encodeURIComponent(issuer + ':' + account)
         + '?secret=' + encodeURIComponent(seed)

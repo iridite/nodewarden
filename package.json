@@ -1,11 +1,19 @@
 {
-  "name": "nodewarden",
+  "name": "nodewarden-enhanced",
   "version": "1.1.0",
-  "description": "Minimal Bitwarden-compatible server running on Cloudflare Workers",
-  "author": "shuaiplus",
+  "description": "Enhanced Bitwarden-compatible server running on Cloudflare Workers (based on NodeWarden by shuaiplus)",
+  "author": "Iridite <https://github.com/Iridyne>",
   "license": "LGPL-3.0",
   "main": "src/index.ts",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/iridite/nodewarden.git"
+  },
+  "homepage": "https://github.com/iridite/nodewarden#readme",
+  "bugs": {
+    "url": "https://github.com/iridite/nodewarden/issues"
+  },
   "scripts": {
     "dev": "wrangler dev -c wrangler.toml",
     "deploymy": "wrangler deploy -c wrangler.my.toml",
@@ -16,7 +24,8 @@
     "vaultwarden",
     "cloudflare",
     "workers",
-    "password-manager"
+    "password-manager",
+    "nodewarden-enhanced"
   ],
   "cloudflare": {
     "bindings": {
